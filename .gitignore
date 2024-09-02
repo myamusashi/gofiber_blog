@@ -1,0 +1,11 @@
+main
+*.zip
+.env
+node_modules/
+static/css/output.css
+go_blog
+server
+tmp/
+air.toml
+markdown_create
+static/css/base.css

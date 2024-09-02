@@ -1,0 +1,49 @@
+{{ template "header" . }}
+    <main>
+        <div class="container mx-auto mt-8 justify-center">
+            <a class="flex justify-center items-center mx-auto max-w-max" href="https://blog.myamusashi.my.id">
+                <svg
+                    class="w-8 h-8 text-gray-500 hover:text-blue-500 transition-colors duration-300 mx-auto"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                    >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M15 19l-7-7 7-7"
+                    />
+                </svg>
+            </a>
+                <article class="prose lg:prose-xl p-8 rounded-lg shadow-lg">
+                        <h1 class="text-white font-bold text-5xl mb-2">{{ .Title }}</h1>
+                        {{with .Author }}
+                                <div id="info_section" class="mb-6 flex flex-row justify-between">
+                                    <p class="text-gray-500">Author: <a class="no-underline text-white hover:text-blue-300" href="mailto:{{ .Email }}">{{ .Name }}</a></p>
+                        {{ end }}
+                                    <p class="text-gray-300">{{ .Date }}</p>
+                                </div>
+                        <hr class="h-px my-6 border-gray-300" />
+                        <div class="text-white text-base">
+                                {{ .Content }}
+                        </div>
+                </article>
+        </div>
+    </main>
+    {{ template "footer" . }}
+
+    <style>
+    p {
+        margin-bottom: 0.5em;
+    }
+    h2 {
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+        font-size: 2em;
+    }
+    </style>
+
+</body>
+</html>
