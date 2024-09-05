@@ -1,7 +1,7 @@
 /*
 Dokumentasi Aplikasi Go dengan framework Fiber dan menggunakan Goldmark untuk konversi markdown ke HTML.
 Aplikasi ini menggunakan beberapa middleware seperti caching dan compression untuk meningkatkan performa
-dari website 
+dari website
 
 Fitur yang diguanakan disini adalah:
 
@@ -39,14 +39,14 @@ import (
 )
 
 func main() {
-    // Render semua template '.html' yang ada di dir 'templates'
+	// Render semua template '.html' yang ada di dir 'templates'
 	Engine := html.New("./templates", ".html")
 
 	app := fiber.New(fiber.Config{
 		Views: Engine,
 	})
-    
-    // Cache file selama 15 menit
+
+	// Cache file selama 15 menit
 	app.Use(cache.New(cache.Config{
 		Expiration:   15 * time.Minute,
 		CacheControl: true,
@@ -56,19 +56,31 @@ func main() {
 		Level: compress.LevelBestSpeed,
 	}))
 
-    // Include semua file yang ada di dir 'static' ke global
+	// Include semua file yang ada di dir 'static' ke global
 	app.Static("/static", "./static")
-    
-    // Render konten markdown berdasarkan slug di markdown tersebut
-	app.Get("/posts/:slug", PostHandler(FileReader{}))
-    
-    // Render tampilan utama dari website
-	app.Get("/", func(c *fiber.Ctx) error {
-		posts, err := loadMarkdownPosts("./markdown")
-		if err != nil {
-			return fiber.NewError(fiber.StatusNotFound, "No markdown here boss!")
-		}
 
+	posts, err := loadMarkdownPosts("./markdown")
+	if err != nil {
+		fiber.NewError(fiber.StatusNotFound, "No markdown here boss!")
+	}
+
+	// Render konten markdown berdasarkan slug di markdown tersebut
+	app.Get("/posts/:slug", PostHandler(FileReader{}))
+
+	app.Get("/tags/:tag", func(c *fiber.Ctx) error {
+		tag := c.Params("tag")
+        
+		posts, err := getPostsByTag(tag) // Filter posts by tag
+		if err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, "Tag post tidak ditemukan")
+		}
+		return c.Render("tag_list", fiber.Map{
+			"Posts": posts,
+		})
+	})
+
+	// Render tampilan utama dari website
+	app.Get("/", func(c *fiber.Ctx) error {
 		// Mengurutkan postingan dari yang paling baru sampai paling lama
 		sort.Slice(posts, func(i, j int) bool {
 			dateFormat := "2006-01-02 15:04"
@@ -84,18 +96,19 @@ func main() {
 	log.Fatal(app.Listen(":8000"))
 }
 
-// Struktur data untuk postingan yang akan ditampilkan berisi metadata, informasi author, dan 
+// Struktur data untuk postingan yang akan ditampilkan berisi metadata, informasi author, dan
 // konten markdown yang sudah diubah menjadi HTML
 type PostData struct {
-	Title                   string `yaml:"Title"`
-	Slug                    string `yaml:"Slug"`
-	Date                    string `yaml:"Date"`
-	Description             string `yaml:"Description"`
-	MetaDescription         string `yaml:"MetaDescription"`
-	MetaPropertyTitle       string `yaml:"MetaPropertyTitle"`
-	MetaPropertyDescription string `yaml:"MetaPropertyDescription"`
-	MetaOgURL               string `yaml:"MetaOgURL"`
-	Author                  Author `yaml:"author"`
+	Title                   string   `yaml:"Title"`
+	Slug                    string   `yaml:"Slug"`
+	Date                    string   `yaml:"Date"`
+	Description             string   `yaml:"Description"`
+	Tags                    []string `yaml:"tags"`
+	MetaDescription         string   `yaml:"MetaDescription"`
+	MetaPropertyTitle       string   `yaml:"MetaPropertyTitle"`
+	MetaPropertyDescription string   `yaml:"MetaPropertyDescription"`
+	MetaOgURL               string   `yaml:"MetaOgURL"`
+	Author                  Author   `yaml:"author"`
 	Content                 template.HTML
 }
 
@@ -106,12 +119,12 @@ type Author struct {
 
 // Handler untuk route '/posts/' berdasarkan slug.
 // PostHandler akan mengembalikan sebuah fiber handler function yang akan memproses request
-// untuk single post berdasarkan slug, dan akan parsing markdown frontmatter, mengubah markdown menjadi HTML, dan
-// Merender post dengan fiber template
+// Untuk single post berdasarkan slug, dan akan parsing markdown frontmatter, mengubah markdown menjadi HTML, dan
+// Render post dengan built-in fiber template
 func PostHandler(sl SlugRender) fiber.Handler {
 	// Konfigurasi markdown dengan extension yang sama dengan markdown
-    // yang ada di Github, dan highlighting dracula
-    mdRenderer := goldmark.New(
+	// yang ada di Github, dan highlighting menggunakan theme 'dracula'
+	mdRenderer := goldmark.New(
 		goldmark.WithExtensions(
 			extension.GFM,
 			highlighting.NewHighlighting(
@@ -119,16 +132,16 @@ func PostHandler(sl SlugRender) fiber.Handler {
 			),
 		),
 	)
-    
+
 	return func(c *fiber.Ctx) error {
 		slug := c.Params("slug")
-		
-        // Mengecek slug 'markdown' dan jika tidak ada akan return error 'not found'
-        postMarkdown, err := sl.Read(slug)
+
+		// Mengecek slug 'markdown' dan jika tidak ada akan return error 'not found'
+		postMarkdown, err := sl.Read(slug)
 		if err != nil {
 			return fiber.NewError(fiber.StatusNotFound, "No post here")
 		}
-        
+
 		var post PostData
 		remainingMd, err := frontmatter.Parse(strings.NewReader(postMarkdown), &post)
 		if err != nil {
@@ -149,6 +162,7 @@ func PostHandler(sl SlugRender) fiber.Handler {
 			"Date":                    post.Date,
 			"Content":                 post.Content,
 			"Description":             post.Description,
+			"Tags":                    post.Tags,
 			"MetaDescription":         post.MetaDescription,
 			"MetaPropertyTitle":       post.MetaPropertyTitle,
 			"MetaPropertyDescription": post.MetaPropertyDescription,
@@ -157,18 +171,44 @@ func PostHandler(sl SlugRender) fiber.Handler {
 	}
 }
 
-// Interface untuk membaca isi konten markdown file 
+// Function to get posts by tag
+func getPostsByTag(tag string) ([]PostData, error) {
+    // Load all posts
+    posts, err := loadMarkdownPosts("./markdown")
+    if err != nil {
+        return nil, err
+    }
+
+    // Filter posts by tag
+    var filteredPosts []PostData
+    for _, post := range posts {
+        for _, t := range post.Tags {
+            if t == tag {
+                filteredPosts = append(filteredPosts, post)
+                break // Exit loop if tag is found
+            }
+        }
+    }
+
+    if len(filteredPosts) == 0 {
+        return nil, fiber.NewError(fiber.StatusNotFound, "No post found tag here")
+    }
+
+    return filteredPosts, nil
+}
+
+// Interface untuk membaca isi konten markdown file
 // tergantung pada slug dari markdown tersebut
 type SlugRender interface {
 	Read(slug string) (string, error)
 }
 
-// FileReader mengimplematasikan SlugRender interface 
-// Ini akan membaca files dari filesystem dan tergantung slug yang diberikan 
+// FileReader mengimplematasikan SlugRender interface
+// Ini akan membaca files dari filesystem dan tergantung slug yang diberikan
 type FileReader struct{}
 
 // Function yang akan membuka file markdown dari path yang dikasih dari slug.
-// Function ini akan me-returns file content sebagai type string, atau memberikan error 
+// Function ini akan me-returns file content sebagai type string, atau memberikan error
 // jika file yang dikasih tidak bisa dibuka(corrupt, not found, dll)
 func (fRead FileReader) Read(slug string) (string, error) {
 	fileRead, err := os.Open("markdown/" + slug + ".md")
@@ -185,9 +225,9 @@ func (fRead FileReader) Read(slug string) (string, error) {
 	return string(b), nil
 }
 
-// Function ini akan membaca semua markdown files dari folder 'markdowns' 
+// Function ini akan membaca semua markdown files dari folder 'markdowns'
 // Function ini akan parse frontmatter dan content dan konversi file markdown tersebut ke HTML
-// Dan akan mengembalikannya beberapa bagian PostData atau error jika ada yang salah dengan file markdown 
+// Dan akan mengembalikannya beberapa bagian PostData atau error jika ada yang salah dengan file markdown
 // atau folder markdown tidak ditemukan
 func loadMarkdownPosts(dir string) ([]PostData, error) {
 	md := goldmark.New()
@@ -208,10 +248,10 @@ func loadMarkdownPosts(dir string) ([]PostData, error) {
 			var postData PostData
 			var buf bytes.Buffer
 
-			// Memisahkan konten dan extract YAML frontmatter dan bagian body dari file markdown 
+			// Memisahkan konten dan extract YAML frontmatter dan bagian body dari file markdown
 			split := strings.SplitN(string(content), "\n---\n", 2)
 			if len(split) > 1 {
-				// Parse YAML front matter -> Convert Markdown to HTML -> Assign HTML content to PostData
+				// Parse YAML front matter -> Convert Markdown ke HTML -> Isi HTML content ke member Content struct PostData
 				err = yaml.Unmarshal([]byte(split[0]), &postData)
 				if err != nil {
 					return err

@@ -8,13 +8,17 @@
             class="w-full md:w-6/12 mb-4 md:mb-6 p-3 md:p-5 transition-colors duration-300 postcard"
         >
             <article>
-                <h2 class="text-white text-2xl md:text-3xl mb-2 md:mb-3 font-semibold capitalize">{{ .Title }}</h2>
+                <h2 class="text-white text-2xl md:text-3xl mb-2 md:mb-3 font-semibold capitalize">
+                    {{ .Title }}
+                </h2>
                 <p class="text-gray-500 text-sm md:text-base md:ml-3 line-clamp-2 md:line-clamp-3">
                     {{ .Description }}
                 </p>
                 <hr class="h-px my-6 md:my-6 border-blue-400" />
                 <div class="flex justify-between">
-                    <h4 class="text-gray-300 text-sm md:text-sm font-normal">Author: {{ .Author.Name }}</h4>
+                    <h4 class="text-gray-300 text-sm md:text-sm font-normal">
+                        Author: {{ .Author.Name }}
+                    </h4>
                     <h6 class="text-gray-400 text-sm md:text-sm">{{ .Date }}</h6>
                 </div>
             </article>
@@ -24,17 +28,15 @@
 </main>
 
 <style>
-        .postcard {
-            background: #020617;
-            border: 1px solid #355baf;
-            cursor: pointer;
-        }
-        .postcard:hover {
-            background: #151520;
-            border: 1px solid #8da5dc;
-        }
+    .postcard {
+        background: #020617;
+        border: 1px solid #355baf;
+        cursor: pointer;
+    }
+    .postcard:hover {
+        background: #151520;
+        border: 1px solid #8da5dc;
+    }
 </style>
 
 {{ template "footer" . }}
-</body>
-</html>

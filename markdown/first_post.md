@@ -1,10 +1,11 @@
 ---
 Title: First Post
-Description: Euy
+Description: Ini adalah postingan blog pertama saya di sini. Tidak ada yang menarik di sini, tapi untuk website blog sederhana ini, saya ingin membuat postingan tentang berbagai topik seperti
 Parent: What is this a subpage of
 Date: 2024-08-29 10:45
 Slug: first_post
 Order: 2
+tags: ["first", "impreesion"]
 MetaPropertyTitle: My First post eva! 
 MetaDescription: Hellow, cek postingan pertama saya disini
 MetaOgURL: https://blog.myamusahi.my.id/posts/first_post
