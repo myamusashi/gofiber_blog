@@ -6,18 +6,18 @@ Date: 2024-08-29 10:45
 Slug: first_post
 Order: 2
 tags: ["first", "impreesion"]
-MetaPropertyTitle: My First post eva! 
+MetaPropertyTitle: My First post eva!
 MetaDescription: Hellow, cek postingan pertama saya disini
 MetaOgURL: https://blog.myamusahi.my.id/posts/first_post
 
 author:
-  name: "Gilang Ramadhan"
-  email: "gilang@gmail.com"
+    name: "Gilang Ramadhan"
+    email: "gilang@gmail.com"
 ---
 
 Ini adalah postingan blog pertama saya di sini. Tidak ada yang menarik di sini, tapi untuk website blog sederhana ini, saya ingin membuat postingan tentang berbagai topik seperti:
 
-## 1. Programming 
+## 1. Programming
 
 Saya akan membahas berbagai konsep seperti algoritma, struktur data, perkenalan dengan tipe-tipe data, fungsi dalam bahasa pemrograman, komposisi, kelas, namespace, dan banyak lagi. Bahasa pemrograman yang akan saya gunakan meliputi C++/C dan mungkin Python (kalau tidak malas).
 

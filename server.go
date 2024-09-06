@@ -69,7 +69,7 @@ func main() {
 
 	app.Get("/tags/:tag", func(c *fiber.Ctx) error {
 		tag := c.Params("tag")
-        
+
 		posts, err := getPostsByTag(tag) // Filter posts by tag
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, "Tag post tidak ditemukan")
@@ -77,6 +77,7 @@ func main() {
 		return c.Render("tag_list", fiber.Map{
 			"Posts": posts,
 		})
+
 	})
 
 	// Render tampilan utama dari website
@@ -173,32 +174,32 @@ func PostHandler(sl SlugRender) fiber.Handler {
 
 // Function to get posts by tag
 func getPostsByTag(tag string) ([]PostData, error) {
-    // Load all posts
-    posts, err := loadMarkdownPosts("./markdown")
-    if err != nil {
-        return nil, err
-    }
+	// Load all posts
+	posts, err := loadMarkdownPosts("./markdown")
+	if err != nil {
+		return nil, err
+	}
 
-    // Filter posts by tag
-    var filteredPosts []PostData
-    for _, post := range posts {
-        for _, t := range post.Tags {
-            if t == tag {
-                filteredPosts = append(filteredPosts, post)
-                break // Exit loop if tag is found
-            }
-        }
-    }
+	// Filter posts by tag
+	var filteredPosts []PostData
+	for _, post := range posts {
+		for _, t := range post.Tags {
+			if t == tag {
+				filteredPosts = append(filteredPosts, post)
+				break // Exit loop if tag is found
+			}
+		}
+	}
 
-    if len(filteredPosts) == 0 {
-        return nil, fiber.NewError(fiber.StatusNotFound, "No post found tag here")
-    }
+	if len(filteredPosts) == 0 {
+		return nil, fiber.NewError(fiber.StatusNotFound, "No post found tag here")
+	}
 
-    return filteredPosts, nil
+	return filteredPosts, nil
 }
 
-// Interface untuk membaca isi konten markdown file
-// tergantung pada slug dari markdown tersebut
+// Interface untuk render slug markdown file
+// pada data yaml slug dari markdown tersebut
 type SlugRender interface {
 	Read(slug string) (string, error)
 }

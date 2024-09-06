@@ -1,8 +1,30 @@
 {{ template "header" . }}
 
+<a
+    class="flex justify-center items-center mx-auto max-w-max mb-2"
+    href="https://blog.myamusashi.my.id"
+>
+    <svg
+        class="w-8 h-8 text-gray-500 hover:text-blue-400 transition-colors duration-300 mx-auto"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+    >
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+    </svg>
+</a>
+
 <main class="container mx-auto mt-6">
+    {{ range .Posts }}
+    <div class="my-6">
+        <h2 class="text-4xl text-neutral-100">Ini yang kamu cari</h2>
+        <p class="text-base text-gray-500">
+            Artikel dengan topik: {{ range $index, $tag := .Tags }} {{ if $index }}, {{ end }}{{$tag
+            }} {{ end }}
+        </p>
+    </div>
     <div class="flex flex-col items-center">
-        {{ range .Posts }}
         <div
             onclick="window.location.href='/posts/{{ .Slug }}'"
             class="w-full md:w-6/12 mb-4 md:mb-6 p-3 md:p-5 transition-colors duration-300 postcard"
@@ -23,8 +45,8 @@
                 </div>
             </article>
         </div>
-        {{ end }}
     </div>
+    {{ end }}
 </main>
 
 <style>
