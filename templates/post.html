@@ -31,7 +31,7 @@
                 </div>
                 <div class="flex text-gray-300 gap-2 justify-end">
                     {{ range .Tags }}
-                    <a  class="text-white px-2 transition-colors mt-6 duration-150 hover:text-slate-950 rounded-sm bg-gray-700 hover:bg-gray-600" href="/tags/{{ . }}"> {{ . }}</a>
+                    <a  class="text-white px-2 transition-colors mt-6 duration-150 hover:text-slate-950 active:hover:text-slate-950 rounded-sm bg-gray-700 hover:bg-gray-600" href="/tags/{{ . }}"> {{ . }}</a>
                     {{ end }}
                 </div>
             </article>
