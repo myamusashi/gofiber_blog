@@ -1,7 +1,7 @@
 /*
 Dokumentasi Aplikasi Go dengan framework Fiber dan menggunakan Goldmark untuk konversi markdown ke HTML.
 Aplikasi ini menggunakan beberapa middleware seperti caching dan compression untuk meningkatkan performa
-dari website
+website
 
 Fitur yang diguanakan disini adalah:
 
@@ -9,8 +9,10 @@ Fitur yang diguanakan disini adalah:
 2. Caching dari website ini akan menyimpan data user selama 15 menit
 3. Kompresi dari website ini menggunakan built-in fiber framework dengan level kompresi
 'best speed' untuk mempercepat delivery website ke client
-4. Loading dan parsing markdown , konversi markdown ke HTML, dan rendering semua HTML menggunakan Fiber template
-5. Posts yang akan ditampilkan di route '/' di urutkan berdasarkan waktu, dari yang paling baru (paling atas) sampai
+4. Loading dan parsing markdown frontmatter YAML dengan library adrg/frontmatter
+5. konversi markdown ke HTML menggunakan library Goldmark
+6. Rendering semua HTML menggunakan Fiber template
+7. Posts yang akan ditampilkan di route '/' di urutkan berdasarkan waktu, dari yang paling baru (paling atas) sampai
 paling lama (paling bawah).
 */
 package main
@@ -74,8 +76,10 @@ func main() {
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, "Tag post tidak ditemukan")
 		}
+
 		return c.Render("tag_list", fiber.Map{
 			"Posts": posts,
+			"Tag":   tag,
 		})
 
 	})
@@ -84,7 +88,7 @@ func main() {
 	app.Get("/", func(c *fiber.Ctx) error {
 		// Mengurutkan postingan dari yang paling baru sampai paling lama
 		sort.Slice(posts, func(i, j int) bool {
-			dateFormat := "2006-01-02 15:04"
+			dateFormat := "2006-01-02 15:04" // What ever man
 			dateI, _ := time.Parse(dateFormat, posts[i].Date)
 			dateJ, _ := time.Parse(dateFormat, posts[j].Date)
 			return dateI.After(dateJ)
@@ -118,13 +122,14 @@ type Author struct {
 	Email string `yaml:"email"`
 }
 
-// Handler untuk route '/posts/' berdasarkan slug.
+// Handler untuk route '/posts/{slug}' dan akan render slug berdasarkan data YAML markdown.
 // PostHandler akan mengembalikan sebuah fiber handler function yang akan memproses request
 // Untuk single post berdasarkan slug, dan akan parsing markdown frontmatter, mengubah markdown menjadi HTML, dan
 // Render post dengan built-in fiber template
 func PostHandler(sl SlugRender) fiber.Handler {
-	// Konfigurasi markdown dengan extension yang sama dengan markdown
-	// yang ada di Github, dan highlighting menggunakan theme 'dracula'
+	// Konfigurasi markdown menggunakan extension GFM(Github Flavored Markdown)
+	// https://github.github.com/gfm/#what-is-github-flavored-markdown-
+	// Dan highlighting menggunakan theme 'dracula'
 	mdRenderer := goldmark.New(
 		goldmark.WithExtensions(
 			extension.GFM,
@@ -137,7 +142,7 @@ func PostHandler(sl SlugRender) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		slug := c.Params("slug")
 
-		// Mengecek slug 'markdown' dan jika tidak ada akan return error 'not found'
+		// Mengecek slug pada data YAML markdown files dan jika tidak ada akan return error 'not found'
 		postMarkdown, err := sl.Read(slug)
 		if err != nil {
 			return fiber.NewError(fiber.StatusNotFound, "No post here")
@@ -192,7 +197,7 @@ func getPostsByTag(tag string) ([]PostData, error) {
 	}
 
 	if len(filteredPosts) == 0 {
-		return nil, fiber.NewError(fiber.StatusNotFound, "No post found tag here")
+		return nil, fiber.NewError(fiber.StatusNotFound, "Doesn't recognize tag name!")
 	}
 
 	return filteredPosts, nil
@@ -227,8 +232,8 @@ func (fRead FileReader) Read(slug string) (string, error) {
 }
 
 // Function ini akan membaca semua markdown files dari folder 'markdowns'
-// Function ini akan parse frontmatter dan content dan konversi file markdown tersebut ke HTML
-// Dan akan mengembalikannya beberapa bagian PostData atau error jika ada yang salah dengan file markdown
+// Function ini akan parse frontmatter dan split YAML dengan body content, dan juga konversi body content markdown tersebut ke HTML
+// Hasil konversi akan mengembalikan isi kontent ke member Content struct PostData atau akan mengembalikan error jika ada yang salah dengan file markdown
 // atau folder markdown tidak ditemukan
 func loadMarkdownPosts(dir string) ([]PostData, error) {
 	md := goldmark.New()
