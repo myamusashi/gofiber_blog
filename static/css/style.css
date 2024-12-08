@@ -8,18 +8,18 @@
 }
 
 body {
-    background: #121212;
+    background: #0D1117;
 }
 
-h1,
-h2,
-h5 {
-    margin: 0;
-}
+/* h1, */
+/* h2, */
+/* h5 { */
+/*     margin: 0; */
+/* } */
 
-h5 {
-    color: #6c7086;
-}
+/* h5 { */
+/*     color: #6c7086; */
+/* } */
 
 .navbar {
     justify-content: center;

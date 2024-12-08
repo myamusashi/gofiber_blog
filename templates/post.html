@@ -1,54 +1,97 @@
 {{ template "header" . }}
-    <main>
-        <div class="container mx-auto mt-8 justify-center">
-            <a class="flex justify-center items-center mx-auto max-w-max mb-2" href="https://blog.myamusashi.my.id">
-                <svg
-                    class="w-8 h-8 text-gray-500 hover:text-blue-400 transition-colors duration-300 mx-auto"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                    >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M15 19l-7-7 7-7"
-                    />
-                </svg>
-            </a>
-            <article class="prose prose-xl p-8 rounded-lg bg-neutral-900 shadow-lg">
-                <h1 class="text-white font-bold text-5xl mb-2 capitalize">{{ .Title }}</h1>
-                {{with .Author }}
-                <div id="info_section" class="my-4 flex flex-row justify-between text-sm">
-                    <p class="text-gray-300">Author: <a class="no-underline text-white hover:text-blue-300" href="mailto:{{ .Email }}">{{ .Name }}</a></p>
-                {{ end }}
-                    <p class="text-gray-300">{{ .Date }}</p>
-                </div>
-                <hr class="h-px my-6 border-blue-400" />
-                <div class="text-white text-base leading-relaxed tracking-wide">
-                        {{ .Content }}
-                </div>
-                <div class="flex text-gray-300 gap-2 justify-end">
-                    {{ range .Tags }}
-                    <a  class="text-white px-2 transition-colors mt-6 duration-150 hover:text-slate-950 active:hover:text-slate-950 rounded-sm bg-gray-700 hover:bg-gray-600" href="/tags/{{ . }}"> {{ . }}</a>
-                    {{ end }}
-                </div>
-            </article>
-        </div>
-    </main>
-    {{ template "footer" . }}
 
-    <style>
-    p {
-        margin-bottom: 0.5em;
+<main>
+    <div class="container mx-auto mt-8 justify-center">
+        <a href="https://blog.myamusashi.my.id" class="flex justify-center items-center mx-auto max-w-max mb-2">
+            <svg class="w-8 h-8 text-gray-500 hover:text-blue-400 transition-colors duration-300 mx-auto"
+                 fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+        </a>
+
+        <article class="mx-auto p-8 rounded-lg bg-neutral-900 shadow-lg
+                        prose prose-xl 
+                        w-full sm:w-[40ch] md:w-[60ch]">
+            <h1 class="text-white font-bold text-4xl mb-2 justify-center text-pretty capitalize max-w-2xl">
+                {{ .Title }}
+            </h1>
+
+            {{with .Author }}
+            <div id="info_section" class="my-4 flex flex-row justify-between text-sm">
+                <p class="text-gray-300">
+                    Author: <a class="no-underline text-white hover:text-blue-300" href="mailto:{{ .Email }}">{{ .Name }}</a>
+                </p>
+            {{ end }}
+                <p class="text-gray-300">{{ .Date }}</p>
+            </div>
+
+            <hr class="h-px my-6 border-blue-400" />
+
+            <div class="text-white text-base leading-relaxed tracking-wide">
+                {{ .Content }}
+            </div>
+
+            <div class="flex text-gray-300 gap-2 justify-end">
+                {{ range .Tags }}
+                <a href="/tags/{{ . }}" class="text-white px-2 mt-6 rounded-sm
+                                               bg-gray-700 hover:bg-gray-600
+                                               transition-colors duration-150
+                                               hover:text-slate-950 active:hover:text-slate-950">
+                    {{ . }}
+                </a>
+                {{ end }}
+            </div>
+        </article>
+    </div>
+</main>
+
+{{ template "footer" . }}
+
+<style>
+    a { color: skyblue; }
+    a:hover { color: #86BED6; }
+    a:active { color: #86BED6; }
+    
+    h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-top: 20px;
+        margin-bottom: 10px;    
     }
+    
+    h4 {
+        font-size: 1rem;
+        font-weight: 500;
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+    
+    pre {
+        white-space: pre;
+        overflow-x: auto;
+        word-wrap: normal;
+        text-align: left;
+        padding: 10px;
+        border-radius: 5px;
+    }
+    
+    p { margin-top: 1.2em; }
+    
     h2 {
         margin-top: 2rem;
+        font-weight: bold;
         margin-bottom: 2rem;
         font-size: 2em;
     }
-    </style>
+    
+    ul {
+        font-weight: bold;
+        list-style-type: disc;
+        padding-left: 20px;
+    }
+    
+    li { margin-bottom: 10px; }   
+</style>
 
 </body>
 </html>
