@@ -11,15 +11,14 @@ import (
 	highlighting "github.com/yuin/goldmark-highlighting/v2"
 	"github.com/yuin/goldmark/extension"
 
-	. "github.com/myamusashi/go_blog/internal/utils"
+	"github.com/myamusashi/go_blog/core/utils"
 )
 
 // Handler untuk route '/posts/{slug}' dan akan render slug berdasarkan parser YAML markdown.
 // PostHandler akan mengembalikan sebuah fiber handler function yang akan memproses request
 // Untuk single post berdasarkan slug, dan akan parsing markdown frontmatter, mengubah markdown menjadi HTML, dan
 // Render post dengan fiber template
-func PostHandler(sl SlugRender) fiber.Handler {
-	// https://github.github.com/gfm/#what-is-github-flavored-markdown-
+func PostHandler(sl utils.SlugRender) fiber.Handler {
 	mdRenderer := goldmark.New(
 		goldmark.WithExtensions(
 			extension.GFM,
@@ -37,7 +36,7 @@ func PostHandler(sl SlugRender) fiber.Handler {
 			return fiber.NewError(fiber.StatusNotFound, "No post here")
 		}
 
-		var post PostData
+		var post utils.PostData
 		remainingMd, err := frontmatter.Parse(strings.NewReader(postMarkdown), &post)
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, "Error parsing frontmatter")

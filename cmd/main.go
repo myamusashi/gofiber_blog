@@ -2,7 +2,7 @@ package main
 
 import (
 	"log"
-	"github.com/myamusashi/go_blog/internal/server"
+	"github.com/myamusashi/go_blog/core/server"
 )
 
 func main()  {
